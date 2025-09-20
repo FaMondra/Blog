@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from datetime import date
+from django.views.generic import ListView
+from .models import Post
 
 # Create your views here.
 
@@ -69,8 +71,19 @@ all_posts = [
 def get_date(post):
   return post['date']
 
+class StartingPageView(ListView) :
 
-def starting_page(request):
+   template_name = "blog/index.html"
+   model = Post
+   ordering = ['-date']
+   context_object_name = 'posts'
+
+   def get_queryset(self):
+      queryset = super().get_queryset()
+      data = queryset[0:3]
+      return data
+
+'''def starting_page(request):
     sorted_posts = sorted(all_posts, key=get_date)
     latest_posts = sorted_posts[-3:]
     return render(request, "blog/index.html", {
@@ -80,7 +93,14 @@ def starting_page(request):
 def posts(request):
     return render(request, "blog/all-posts.html", {
       "all_posts": all_posts
-    })
+    })'''
+
+class AllPostsView(ListView) :
+
+   template_name = 'blog/all-posts.html'
+   model = Post
+   ordering = ['-date']
+   context_object_name = 'all_posts'
 
 def post_detail(request, slug):
     identified_post = next(post for post in all_posts if post['slug'] == slug)
